@@ -1,8 +1,6 @@
 #include <iostream>
-#include<vector>
 using namespace std;
 
-#pragma region Method
 class Method{
     public:
     void InputanUser(){
@@ -27,14 +25,6 @@ class Method{
             cout << "Masukkan Hasil Dari Persamaan : ";
             cin >> b[i];
         }
-        EliminasiGauss(a, b, m, n);
-    }
-
-    void EliminasiGauss(float a[][], float b[], int m, int n){
-
-    }
-
-    void EliminasiGaussJordan(float a[][], float b[] ,int m, int n){
         //Eliminasi Dengan Gauss-Jordan
         //Perulangan Pada Kolom
         for(int j = 0; j < n; j++){
@@ -45,6 +35,7 @@ class Method{
                     //Deklarasi Variable c
                     //Variable c berisi nilai 
                     int c = a[i][j]/a[j][j];
+                    int d = b[i]/b[j];
                     //Perulangan Pada Kolom
                     for(int k = 0; k < n; k++){
                         //Cek Apakah Positif atau Negatif
@@ -62,14 +53,71 @@ class Method{
                                 a[i][k] -= c;
                         }
                     }
+                    if(b[i] > 0){
+                        if(d > 0)
+                            b[i] -= d;
+                        else
+                            b[i] += d;
+                    }else{
+                        if(d > 0)
+                            b[i] += d;
+                        else
+                            b[i] -= d;
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < n; i++){
+            cout << "X" << i+1 << " = " << a[i][i];
+        }
+    }
+
+    void EliminasiGaussJordan(float a[][10], float b[], int m, int n){
+        //Eliminasi Dengan Gauss-Jordan
+        //Perulangan Pada Kolom
+        for(int j = 0; j < n; j++){
+            //Perulangan Pada Baris
+            for(int i = 0; i < m; i++){
+                //Cek Jika Kolom dan Baris Tidak Bernilai Sama/Menghindari Baris 1-Baris 1
+                if(i != j){
+                    //Deklarasi Variable c
+                    //Variable c berisi nilai 
+                    int c = a[i][j]/a[j][j];
+                    int d = b[i]/b[j];
+                    //Perulangan Pada Kolom
+                    for(int k = 0; k < n; k++){
+                        //Cek Apakah Positif atau Negatif
+                        if(a[i][k] > 0){
+                            //Cek Apakah Positif atau Negatif
+                            if(c > 0) 
+                                a[i][k] -= c;
+                            else
+                                a[i][k] += c;
+                        }else{
+                            //Cek Apakah Positif atau Negatif
+                            if(c > 0) 
+                                a[i][k] += c;
+                            else
+                                a[i][k] -= c;
+                        }
+                    }
+                    if(b[i] > 0){
+                        if(d > 0)
+                            b[i] -= d;
+                        else
+                            b[i] += d;
+                    }else{
+                        if(d > 0)
+                            b[i] += d;
+                        else
+                            b[i] -= d;
+                    }
                 }
             }
         }
     }
 };
-#pragma endregion
 
-#pragma region Menu
 class MenuType{
     public:
     void Menu(){
@@ -84,16 +132,6 @@ class MenuType{
         switch(i){
             case 1:
                 Metode1();
-            break;
-            case 2:
-            
-            break;
-            case 3:
-
-            break;
-            case 4:
-            //Exit Programs
-                exit(NULL);
             break;
         }
     }
@@ -112,22 +150,12 @@ class MenuType{
                 Method method;
                 method.InputanUser();
             break;
-            case 2:
-
-            break;
-            case 3:
-
-            break;
-            case 4:
-
-            break;
             case 5:
                 Menu();
             break;
         }
     }
 };
-#pragma endregion
 
 //This Is Main Programs
 int main(){
