@@ -1,4 +1,5 @@
 #include <iostream>
+#include<vector>
 using namespace std;
 
 #pragma region Method
@@ -28,45 +29,42 @@ class Method{
         }
         EliminasiGauss(a, b, m, n);
     }
-    void EliminasiGauss(float a[][], float b[] ,int m, int n){
-        //Menghitung Banyaknya 0 Pada Baris
-        int temp[n];
-        for(int i = 0; i < m; i++){
-            for(int j = 0; j < n; j++){
-                if(a[i][j] == 0)
-                    temp[i]++;
-            }
-        }
-        //Best Case Scenario
-        for(int i = 0; i < m; i++){
-            for(int j = 0; j < n; j++){
-                if(j == i && a[i][j] != 0){
-                    for(int k = j; k < n; k++){
-                        if(a[j][k] > 0)
-                            a[j][k] -= a[i][k]*a[j][k]/a[i][k];
-                        else
-                            a[j][k] += a[i][k]*a[j][k]/a[i][k];
-                    }
-                }
-            }
-        }
-        for(int i = 0; i < m; i++){
-            for(int j = 0; j < n; j++){
-                if(j == i & a[i][j] != 1){
-                    for(int k = j; k < n; k++){
-                        if(a[j][k] > 0)
-                            a[j][k] /= a[j][k];
-                        else
-                            a[j][k] /= -a[j][k];
-                    }
-                }
-            }
-        }
-        // for(int i = 0; i < m; i++){
-        //     for(int j = 0; j < n; j++){
 
-        //     }
-        // }
+    void EliminasiGauss(float a[][], float b[], int m, int n){
+
+    }
+
+    void EliminasiGaussJordan(float a[][], float b[] ,int m, int n){
+        //Eliminasi Dengan Gauss-Jordan
+        //Perulangan Pada Kolom
+        for(int j = 0; j < n; j++){
+            //Perulangan Pada Baris
+            for(int i = 0; i < m; i++){
+                //Cek Jika Kolom dan Baris Tidak Bernilai Sama/Menghindari Baris 1-Baris 1
+                if(i != j){
+                    //Deklarasi Variable c
+                    //Variable c berisi nilai 
+                    int c = a[i][j]/a[j][j];
+                    //Perulangan Pada Kolom
+                    for(int k = 0; k < n; k++){
+                        //Cek Apakah Positif atau Negatif
+                        if(a[i][k] > 0){
+                            //Cek Apakah Positif atau Negatif
+                            if(c > 0) 
+                                a[i][k] -= c;
+                            else
+                                a[i][k] += c;
+                        }else{
+                            //Cek Apakah Positif atau Negatif
+                            if(c > 0) 
+                                a[i][k] += c;
+                            else
+                                a[i][k] -= c;
+                        }
+                    }
+                }
+            }
+        }
     }
 };
 #pragma endregion
@@ -136,3 +134,5 @@ int main(){
     MenuType menuType;
     menuType.Menu();
 }
+
+
