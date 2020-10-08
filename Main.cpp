@@ -1,8 +1,8 @@
 #include<iostream>
 using namespace std;
 
-
 class SPLClass{
+    #define N 100
     public:
     void SPL(){
         //Deklarasi Persamaan
@@ -12,9 +12,8 @@ class SPLClass{
         cout << "Masukkan Jumlah Variable : ";
         cin >> n;
         //Deklarasi Variable Persamaan
-        float a[m][n];
+        float a[m][N];
         //Deklarasi Variable Hasil Persamaan
-        float b[m];
         for(int i = 0; i < m; i++){
             // Menerima Inputan Untuk Persamaan Ke-i
             cout << "Masukkan Persamaan " << i+1 << " : " << endl;
@@ -24,60 +23,61 @@ class SPLClass{
                 cin >> a[i][j];
             }
             cout << "Masukkan Hasil Dari Persamaan : ";
-            cin >> b[i];
+            cin >> a[i][n-1];
         }
     }
 };
 
 class CramerClass{
+    #define N 100
     public:
-    // Deklarasi Ukuran Matrix
-        int n;
     void Cramer(){
+        // Deklarasi Ukuran Matrix
+        int n;
         //Menerima Ukuran Matrix
         cout << "Masukkan Ukuran Matrix : ";
         cin >> n;
         //Deklarasi Determinan
         float det[n+1];
         //Deklarasi Matrix
-        float a[n][n];
-        float b[n];
+        float a[n][N];
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 //Menerima Inputan Untuk Matrix Aij
                 cout << "Masukkan Nilai A[" << i+1 << "][" << j+1 << "] : ";
                 cin >> a[i][j];
+
             }
             cout << "Masukkan Hasil Dari Persamaan " << i+1 << " : ";
-            cin >> b[i];
+            cin >> a[i][n];
         }
+
     //Dapatkan Determinan A
         //Membentuk Segitiga Atas
-        for(int j = 0; j < n; j++){
-            for(int i = j; i < n; i++){
-                if(i != j){
-                    float x = a[j][j];
-                    float y = a[i][j];
-                    for(int k = 0; k < n; k++){
-                        if(a[i][k] > 0)
-                            a[i][k] -= y/x*a[j][k];
-                        else
-                            a[i][k] += y/x*a[j][k];
-                    }
+        for(int j = 0; j < n-1; j++){
+            for(int i = j+1; i < n; i++){
+                //Fungsi Operasi Baris Elementer
+                float x = a[j][j];
+                float y = a[i][j];
+                for(int k = 0; k < n; k++){
+                    a[i][k] -= a[j][k]*y/x;
                 }
             }
         }
+        
         //Peroleh Determinan
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 if(i == j) //Diagonal Utama
-                    det[0] += a[i][j];
+                    det[0] *= a[i][j];
             }
         }
+
         //Peroleh Determinan A[x]
-        for(int i = 1; i < n; i++){
-            det[i] = DeterminanHasil(*a, i, b);
+        for(int i = 1; i < n+1; i++){
+            det[i] = DeterminanHasil(a, i, n);
         }
+
         //Cetak Solusi Persamaan
         cout << "Solusi dari Persamaan :" << endl;
         for(int i = 1; i < n+1; i++){
@@ -85,44 +85,43 @@ class CramerClass{
         }
     }
 
-    float DeterminanHasil(float *a, int x, float b[]){
+    float DeterminanHasil(float a[][N], int x, int n){
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 if(j == x){
-                    *((a+i*n)+j) = b[i];
+                    a[i][j] = a[i][n];
                 }
             }
         }
+        
     //Dapatkan Determinan A[x]
         //Membentuk Segitiga Atas
         for(int j = 0; j < n; j++){
-            for(int i = j; i < n; i++){
-                if(i != j){
-                    float x = *((a+j)+j);
-                    float y = *((a+i)+j);
-                    for(int k = 0; k < n; k++){
-                        if(*((a+i)+k) > 0)
-                            *((a+i)+k) -= y/x**((a+j)+k);
-                        else
-                            *((a+i)+k) += y/x**((a+j)+k);
-                    }
+            for(int i = j+1; i < n; i++){
+                float x = a[j][j];
+                float y = a[i][j];
+                for(int k = 0; k < n; k++){
+                    a[i][k] -= a[j][k]*y/x;
                 }
             }
         }
-        float temp = 0;
+
+        float det = 1;
         //Peroleh Determinan
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 if(i == j) //Diagonal Utama
-                    temp += *((a+i)+j);
+                    det *= a[i][j];
             }
         }
-        return temp;
+        return det;
     }
 };
 
 class DeterminanClass{
+    #define N 100
     public:
+    #pragma region ReduksiBaris
     void ReduksiDeterminan(){
         // Deklarasi Ukuran Matrix
         int n;
@@ -130,9 +129,8 @@ class DeterminanClass{
         cout << "Masukkan Ukuran Matrix : ";
         cin >> n;
         //Deklarasi Determinan
-        float det = 1;
         //Deklarasi Matrix
-        float a[n][n];
+        float a[n][N];
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 //Menerima Inputan Untuk Matrix Aij
@@ -140,45 +138,27 @@ class DeterminanClass{
                 cin >> a[i][j];
             }
         }
-
+        float det = BentukSegitiga(a, n);
+        cout << "Determinan Dari Matrix : " << det << endl;
+    }
+    float BentukSegitiga(float a[][N], int n){
+        //Deklarasi Varible Determinan
+        float det = 1;
         //Membentuk Segitiga Atas
-        int p = 0; //Jumlah Pertukaran
-        int temp[n][n];
-        for(int j = 0; j < n; j++){
-            for(int i = j; i < n; i++){
-                //Pengecekan Data yang bernilai 0 atau tidak
-                for(int k = 0; k < n; k++){
-                    if(a[i][j] == 0){
-                        temp[i][j] = 1;
-                    }else{
-                        temp[i][j] = 0;
-                    }
-                }
+        for(int j = 0; j < n-1; j++){
+            for(int i = j+1; i < n; i++){
                 //Fungsi Operasi Baris Elementer
-                if(i != j){
-                    float x = a[j][j];
-                    float y = a[i][j];
-                    for(int k = 0; k < n; k++){
-                        if(a[i][k] >= 0){
-                            if(a[j][k] > 0)
-                                a[i][k] -= y/x*a[j][k];
-                            else
-                                a[i][k] += y/x*a[j][k];
-
-                        }else{
-                            if(a[j][k] > 0)
-                                a[i][k] += y/x*a[j][k];
-                            else
-                                a[i][k] -= y/x*a[j][k];
-                        }
-                    }
+                float x = a[j][j];
+                float y = a[i][j];
+                for(int k = 0; k < n; k++){
+                    a[i][k] -= a[j][k]*y/x;
                 }
             }
         }
 
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
-                cout << temp[i][j] << "\t";
+                cout << a[i][j] << "\t";
             }
             cout << endl;
         }
@@ -186,12 +166,78 @@ class DeterminanClass{
         //Peroleh Determinan
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
-                if(j == i) //Diagonal Utama
+                 //Diagonal Utama
+                 if(j == i)
                     det *= a[i][j];
             }
         }
-        cout << "Determinan Dari Matrix : " << det << endl;
     }
+    #pragma endregion
+   #pragma region Ekspansi Kofaktor
+    void EkspansiKofaktor(){
+        // Deklarasi Ukuran Matrix
+        int n;
+        //Menerima Ukuran Matrix
+        cout << "Masukkan Ukuran Matrix : ";
+        cin >> n;
+        
+        //Deklarasi Matrix
+        float a[n][N];
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                //Menerima Inputan Untuk Matrix Aij
+                cout << "Masukkan Nilai A[" << i+1 << "][" << j+1 << "] : ";
+                cin >> a[i][j];
+            }
+        }
+        cout << "Determinan Dari Matrix : " << endl;
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                cout << a[i][j] << "\t";
+            }
+            cout << endl;
+        }
+        cout << "Determinan = " << Ekspansi(a, n);
+    }
+
+    float Ekspansi(float a[][N], int n){
+        int Det = 0;
+
+        if(n == 1) return a[0][0]; //Return satu jika satu elemen saja
+
+        //Deklarasi Kofaktor
+        float CoFac[n][N];
+        
+        //Peroleh Kofaktor
+        for(int i = 0; i < n; i++){
+            //Peroleh Kofaktor
+            Kofaktor(a, CoFac, 0, i, n);
+            //Peroleh Determinan
+            if(i%2==0) Det += a[0][i] * Ekspansi(CoFac, n-1);
+            else Det += -1 * a[0][i] * Ekspansi(CoFac, n-1);
+        }
+
+        //Kembalikan Nilai Determinan
+        return Det;
+    }
+
+    void Kofaktor(float a[][N], float CoFac[][N], int b, int k, int n){
+        int l = 0, m = 0; //Index Dalam Pembuatn Minor
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                if(i != b && j != k){ //Bentuk Minor
+                    //Mengambil Nilai Dari Matrix A ke Minor
+                    CoFac[l][m++] = a[i][j];
+                    //Reset Pengulangan Pada Index Minor
+                    if(m == n-1){
+                        m = 0;
+                        l++;
+                    }
+                }
+            }
+        }
+    }
+    #pragma endregion
 };
 
 class MenuClass{
@@ -250,18 +296,18 @@ class MenuClass{
     void Kedua(){
         cout << "Pilih Metode : " << endl;
         cout << "1. Reduksi Baris" << endl; //Completed
-        cout << "2. Ekspansi Kofaktor" << endl;
+        cout << "2. Ekspansi Kofaktor" << endl; //Completed
         cout << "3. Kembali Ke Menu Sebelumnya" << endl; //Completed
         cout << "Masukkan Pilihan : ";
         int i;
         cin >> i;
         switch(i){
+            DeterminanClass deter;
             case 1:
-                DeterminanClass deter;
                 deter.ReduksiDeterminan();
             break;
             case 2:
-            
+                deter.EkspansiKofaktor();
             break;
             case 3:
                 Menu();
