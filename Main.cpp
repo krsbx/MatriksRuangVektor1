@@ -112,7 +112,7 @@ class SPLClass{
             for(int i = j-1; i >= 0; i--){
                 float x = a[j][j];
                 float y = a[i][j];
-                //Perulangan Untuk Memperoleh Baris Eselon Tereduksi
+                //Perulangan Untuk Memperoleh Baris Eselon Tereduksi 
                 for(int k = n+1; k >= i; k--){
                     //Peroleh 0 Jika y/x tidak sama dengan 0
                     if((y/x > 0 ? y/x : -1 * y/x) > 0)
@@ -136,8 +136,10 @@ class SPLClass{
             float maxValue = a[maxId][j]; //Elemen Matrix Pada Diagonal Utama
             //Pengecekan Nilai Pada Elemen Matrix i,j > Dari maxValue
             for(int i = j+1; i < m; i++){
-                if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue)
+                if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue){
+                    maxId = i;
                     maxValue = a[i][j];
+                }
             }
 
             //Kembalikan Nilai Jika 0 Pada Diagonal Utama
@@ -220,6 +222,8 @@ class CramerClass{
                 }
             }
         }
+        //Penentu Banyak Penukaran
+        int t = 0;
         //Perulangan Pada Kolom
         for(int j = 0; j < n; j++){
             //Peroleh Index untuk Pengecekan
@@ -229,12 +233,16 @@ class CramerClass{
             //Perulangan Pada Baris
             for(int i = j+1; i < n; i++){
                 //Cek Jika Nilai |a[i][j]| > maxValue
-                if((a[i][j] > 0 ? a[i][j] : -1 * a[i][j]) > maxValue) maxValue = a[i][j];
+                if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue){
+                    maxId = i;
+                    maxValue = a[i][j];
+                }
             }
+
             //Kembalikan jika 0 Pada Diagonal Utama
             if(!a[j][maxId]) return j;
 
-            if(maxId != j) TukarBaris(a, n, j, maxId);
+            if(maxId != j) TukarBaris(a, n, j, maxId, &t);
             
             //Eliminasi Baris //Bentuk Segitiga Atas
             for(int i = j+1; i < n; i++){
@@ -247,10 +255,10 @@ class CramerClass{
                 }
             }
         }
-        return GetDeterminant(a, n);
+        return GetDeterminant(a, n, t);
     }
 
-    float GetDeterminant(float a[][N], int n){
+    float GetDeterminant(float a[][N], int n, int t){
         //Deklarasi Variable Det
         float det = 1;
 
@@ -259,17 +267,21 @@ class CramerClass{
             det *= a[i][i];
         }
 
+        if(t % 2 == 1)  det *= -1;
+
         //Kembalikan Nilai Diagonal Utama
         return det;
     }
 
-    void TukarBaris(float a[][N], int n, int y1, int y2){
+    //Tukarkan Baris Pada Matrix A
+    void TukarBaris(float a[][N], int n, int y1, int y2, int *t){
         //Penukaran Baris
         for(int i = 0; i < n; i++){
             float temp = a[y1][i];
             a[y1][i] = a[y2][i];
             a[y2][i] = temp;
         }
+        *t += 1;
     }
 };
 
@@ -293,40 +305,73 @@ class DeterminanClass{
                 cin >> a[i][j];
             }
         }
-        float det = BentukSegitiga(a, n);
-        cout << "Determinan Dari Matrix : " << det << endl;
-    }
-
-    float BentukSegitiga(float a[][N], int n){
-        //Deklarasi Varible Determinan
-        float det = 1;
-        //Membentuk Segitiga Atas
-        for(int j = 0; j < n-1; j++){
-            for(int i = j+1; i < n; i++){
-                //Fungsi Operasi Baris Elementer
-                float x = a[j][j];
-                float y = a[i][j];
-                for(int k = 0; k < n; k++){
-                    a[i][k] -= a[j][k]*y/x;
-                }
-            }
-        }
-
+        float det = OperasiBarisElementer(a, n);
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 cout << a[i][j] << "\t";
             }
             cout << endl;
         }
+        cout << "Determinan Dari Matrix : " << det << endl;
+    }
 
-        //Peroleh Determinan
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                 //Diagonal Utama
-                 if(j == i)
-                    det *= a[i][j];
+    float OperasiBarisElementer(float a[][N], int n){
+        //Penentu Banyak Penukaran
+        int t = 0;
+        //Perulangan Pada Kolom
+        for(int j = 0; j < n; j++){
+            //Peroleh Index Untuk Pengecekan
+            int maxId = j;
+            //Peroleh Nilai Untuk Pengecekan
+            float maxValue = a[maxId][j];
+            //Perulangan Pada Baris
+            for(int i = j+1; i < n; i++){
+                if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue){
+                    maxId = i;
+                    maxValue = a[i][j];
+                }
+            }
+
+            //Return Jika 0 Pada Diagonal Utama
+            if(!a[j][maxId]) return j;
+
+            //Tukarkan Baris
+            if(maxId != j) TukarBaris(a, n, j, maxId, &t);
+
+            //Perulangan Pada Baris
+            for(int i = j+1; i < n; i++){
+                float x = a[j][j];
+                float y = a[i][j];
+                //Perulangan Pada Kolom
+                for(int k = 0; k < n; k++){
+                    //Peroleh 0
+                    a[i][k] -= a[j][k] * y/x;
+                }
             }
         }
+        return GetDeterminant(a, n, t);
+    }
+
+    void TukarBaris(float a[][N], int n, int y1, int y2, int* t){
+        //Tukarkan Nilai Pada Baris
+        for(int i = 0; i < n; i++){
+            float temp = a[y1][i];
+            a[y1][i] = a[y2][i];
+            a[y2][i] = temp;
+        }
+        *t += 1;
+    }
+
+    float GetDeterminant(float a[][N], int n, int t){
+        float det = 1;
+        //Kalikan Semua Nilai Pada Diagonal Utama
+        for(int i = 0; i < n; i++){
+            det *= a[i][i];
+        }
+        
+        if(t % 2 == 1) det *= -1;
+
+        return det;
     }
     #pragma endregion
     #pragma region Ekspansi Kofaktor
@@ -400,9 +445,9 @@ class MenuClass{
     public:
     void Menu(){
         cout << "Pilih Aksi : " << endl;
-        cout << "1. Sistem Persamaan Linier n Variable" << endl;
-        cout << "2. Menghitung Determinan" << endl;
-        cout << "3. Menentukan Matriks Balikan" << endl;
+        cout << "1. Sistem Persamaan Linier n Variable" << endl; //Completed 4 of 5
+        cout << "2. Menghitung Determinan" << endl; //Completed
+        cout << "3. Menentukan Matriks Balikan" << endl; //Pending
         cout << "4. Keluar" << endl;
         cout << "Masukkan Pilihan : ";
         int i;
@@ -451,7 +496,7 @@ class MenuClass{
     }
     void Kedua(){
         cout << "Pilih Metode : " << endl;
-        cout << "1. Reduksi Baris" << endl; //On Going
+        cout << "1. Reduksi Baris" << endl; //Completed
         cout << "2. Ekspansi Kofaktor" << endl; //Completed
         cout << "3. Kembali Ke Menu Sebelumnya" << endl; //Completed
         cout << "Masukkan Pilihan : ";
