@@ -232,7 +232,7 @@ class CramerClass{
             float maxValue = a[maxId][j];
             //Perulangan Pada Baris
             for(int i = j+1; i < n; i++){
-                //Cek Jika Nilai |a[i][j]| > maxValue
+                //Cek Nilai Lebih Besar Dengan Nilai Mutlak
                 if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue){
                     maxId = i;
                     maxValue = a[i][j];
@@ -306,12 +306,6 @@ class DeterminanClass{
             }
         }
         float det = OperasiBarisElementer(a, n);
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                cout << a[i][j] << "\t";
-            }
-            cout << endl;
-        }
         cout << "Determinan Dari Matrix : " << det << endl;
     }
 
@@ -326,6 +320,7 @@ class DeterminanClass{
             float maxValue = a[maxId][j];
             //Perulangan Pada Baris
             for(int i = j+1; i < n; i++){
+                //Cek Nilai Lebih Besar Dengan Nilai Mutlak
                 if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue){
                     maxId = i;
                     maxValue = a[i][j];
@@ -338,7 +333,7 @@ class DeterminanClass{
             //Tukarkan Baris
             if(maxId != j) TukarBaris(a, n, j, maxId, &t);
 
-            //Perulangan Pada Baris
+            //Eliminasi Baris
             for(int i = j+1; i < n; i++){
                 float x = a[j][j];
                 float y = a[i][j];
@@ -352,6 +347,7 @@ class DeterminanClass{
         return GetDeterminant(a, n, t);
     }
 
+    //Tukarkan Baris Pada Matrix A
     void TukarBaris(float a[][N], int n, int y1, int y2, int* t){
         //Tukarkan Nilai Pada Baris
         for(int i = 0; i < n; i++){
@@ -374,6 +370,7 @@ class DeterminanClass{
         return det;
     }
     #pragma endregion
+    
     #pragma region Ekspansi Kofaktor
     void EkspansiKofaktor(){
         // Deklarasi Ukuran Matrix
@@ -441,13 +438,169 @@ class DeterminanClass{
     #pragma endregion
 };
 
+class InverseClass{
+    public:
+    #define N 100
+    void Inverse(){
+        // Deklarasi Ukuran Matrix
+        int n;
+        //Menerima Ukuran Matrix
+        cout << "Masukkan Ukuran Matrix : ";
+        cin >> n;
+        //Deklarasi Determinan
+        //Deklarasi Matrix
+        float a[n][N];
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                //Menerima Inputan Untuk Matrix Aij
+                cout << "Masukkan Nilai A[" << i+1 << "][" << j+1 << "] : ";
+                cin >> a[i][j];
+            }
+        }
+
+        OperasiBarisElementer(a, n);
+    }
+
+    void OperasiBarisElementer(float a[][N], int n){
+        //Jadikan Augmented
+        //Masukan Identitas
+        for(int i = 0; i < n; i++){
+            for(int j = n; j < n*2; j++){
+                if(j == i+n)
+                    a[i][j] = 1;
+                else
+                    a[i][j] = 0;
+            }
+        }
+
+        //Perulangan Pada Kolom
+        for(int j = 0; j < n; j++){
+            //Peroleh Index Untuk Pengecekan
+            int maxId = j;
+            //Peroleh Nilai Untuk Pengecekan
+            float maxValue = a[maxId][j];
+            //Perulangan Pada Baris
+            for(int i = j+1; i < n; i++){
+                //Cek Nilai Lebih Besar Dengan Nilai Mutlak
+                if((a[i][j] > 0 ? a[i][j] : -1*a[i][j]) > maxValue){
+                    maxValue = a[i][j];
+                    maxId = i;
+                }
+            }
+
+            //Pertukarkan Baris
+            if(maxId != j) TukarBaris(a, n, j, maxId);
+
+            //Eliminasi Baris
+            for(int i = j+1; i < n; i++){
+                float x1 = a[j][j];
+                float x2 = a[i][j];
+                //Peroleh 0
+                for(int k = 0; k < n*2; k++){
+                    a[i][k] -= a[j][k] * x2/x1;
+                }
+            }
+        }
+        BackwardPhase(a, n);
+    }
+    
+    //Tukarkan Baris Pada Matrix A
+    void TukarBaris(float a[][N], int n, int y1, int y2){
+        //Tukarkan Nilai Pada Baris
+        for(int i = 0; i < n*2; i++){
+            float temp = a[y1][i];
+            a[y1][i] = a[y2][i];
+            a[y2][i] = temp;
+        }
+    }
+
+    void BackwardPhase(float a[][N], int n){
+        //Peroleh 1 Utama
+        for(int i = 0; i < n; i++){
+            float x = a[i][i];
+            for(int j = 0; j < n*2; j++){
+                a[i][j] /= x;
+            }
+        }
+
+        //Perulangan Pada Kolom
+        for(int j = n-1; j >= 0; j--){
+            //Perulangan Pada Baris
+            for(int i = j-1; i >= 0; i--){
+                //X Untuk Matrix A
+                float x1 = a[j][j];
+                float x2 = a[i][j];
+                //Peroleh 0 Pada Matrix A
+                for(int k = n*2-1; k >= i; k--){
+                    a[i][k] -= a[j][k] * x2/x1;
+                }
+            }
+        }
+
+
+        cout << "Inverse Matrix A ialah : " << endl;
+        for(int i = 0; i < n; i++){
+            for(int j = n; j < n*2; j++){
+                cout << a[i][j] << "\t";
+            }
+            cout << endl;
+        }
+    }
+};
+
+class InverseMethod{
+    #define N 100
+    public:
+    void InverseSPL(){
+        // Deklarasi Ukuran Matrix
+        int n;
+        //Menerima Ukuran Matrix
+        cout << "Masukkan Ukuran Matrix : ";
+        cin >> n;
+        //Deklarasi Matrix
+        float a[n][N];
+        //Deklarasi Matrix Hasil
+        float b[n];
+        //Deklarasi Matrix Solusi
+        float x[n];
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                //Menerima Inputan Untuk Matrix Aij
+                cout << "Masukkan Nilai A[" << i+1 << "][" << j+1 << "] : ";
+                cin >> a[i][j];
+
+            }
+            cout << "Masukkan Hasil Dari Persamaan " << i+1 << " : ";
+            cin >> b[i];
+        }
+
+        InverseClass inverse;
+        inverse.OperasiBarisElementer(a, n);
+
+        cout << "Sehingga : " << endl;
+        for(int i = 0; i < n; i++){
+            cout << "X[" << i+1 << "] = ";
+            x[i] = GetX(a, b, n, i);
+            cout << x[i] << endl;
+        }
+    }
+
+    float GetX(float a[][N], float b[], int n, int x){
+        float temp = 0;
+        for(int j = n; j < n*2; j++){
+            temp += a[x][j] * b[(j-n)];
+        }   
+        return temp;
+    }
+};
+
 class MenuClass{
     public:
     void Menu(){
         cout << "Pilih Aksi : " << endl;
-        cout << "1. Sistem Persamaan Linier n Variable" << endl; //Completed 4 of 5
+        cout << "1. Sistem Persamaan Linier n Variable" << endl; //Completed
         cout << "2. Menghitung Determinan" << endl; //Completed
-        cout << "3. Menentukan Matriks Balikan" << endl; //Pending
+        cout << "3. Menentukan Matriks Balikan" << endl; //Completed
         cout << "4. Keluar" << endl;
         cout << "Masukkan Pilihan : ";
         int i;
@@ -483,7 +636,8 @@ class MenuClass{
                 pertama.SPLGaussJordan();
             break;
             case 3:
-
+                InverseMethod inverse;
+                inverse.InverseSPL();
             break;
             case 4:
                 CramerClass cramer;
@@ -516,7 +670,8 @@ class MenuClass{
         }
     }
     void Ketiga(){
-
+        InverseClass inverse;
+        inverse.Inverse();
     }
 };
 
@@ -524,3 +679,17 @@ int main(){
     MenuClass menu;
     menu.Menu();
 }
+
+/*
+3 3
+5  7  9
+4  3  8
+7  5  6
+
+
+1 3 3
+1 2 3 5
+2 5 3 3
+1 0 8 1
+
+*/
