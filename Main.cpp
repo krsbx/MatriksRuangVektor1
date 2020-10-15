@@ -621,7 +621,7 @@ class MenuClass{
         cout << "Pilih Metode : " << endl;
         cout << "1. Eliminasi Gauss" << endl; //Completed
         cout << "2. Eliminasi Gauss-Jordan" << endl; //Completed
-        cout << "3. Metode Matriks Balikan" << endl; //On Going
+        cout << "3. Metode Matriks Balikan" << endl; //Completed
         cout << "4. Kaidah Cramer" << endl; //Completed
         cout << "5. Kembali Ke Menu Sebelumnya" << endl; //Completed
         cout << "Masukkan Pilihan : ";
